@@ -101,7 +101,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Regression tests failed.' }
 
 On recent Windows versions, advanced color includes both HDR and SDR wide-color management. The application uses the newer HDR-specific query/set operations when supported, rather than assuming that the legacy advanced-color flag means HDR is active.
 
-Display Settings can be hosted in `ApplicationFrameHost.exe`. Cleanup identifies its `SystemSettings.exe` child and closes the visible Settings window. If normal closure fails, it can stop that specific Settings process; it does not terminate the shared frame host.
+Display Settings can be hosted in `ApplicationFrameHost.exe`. Cleanup identifies its `SystemSettings.exe` child and terminates only that verified process, matching the original application's cleanup strategy. It waits for process exit before optionally restoring an SDR profile. This avoids the `WM_CLOSE` teardown path associated with Settings access violations observed in local testing; the shared frame host is never terminated.
 
 The application reports Windows' display state and profile associations. Confirming that a calibration looks correct still requires checking the display itself.
 

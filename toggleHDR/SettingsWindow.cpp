@@ -143,30 +143,22 @@ bool CloseDisplaySettings(const SettingsWindow& window) {
     if (!window.settingsPid || SettingsProcessForWindow(window.hwnd) != window.settingsPid)
         return false;
 
-    // Keep a handle to the captured process while waiting. If it exits, do not
-    // mistake a later process reusing the numeric PID for the original target.
-    ProcessHandle original(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE,
-                                       FALSE, window.settingsPid));
-    DWORD_PTR messageResult = 0;
-    SendMessageTimeoutW(window.hwnd, WM_CLOSE, 0, 0,
-                        SMTO_ABORTIFHUNG | SMTO_ERRORONEXIT, 1000, &messageResult);
-    if (WaitForWindowToClose(window, 2000)) return true;
-
-    // A stale host frame may outlive the Settings process. Never terminate that
-    // shared frame host; it can host unrelated Windows applications as well.
-    if (!original || WaitForSingleObject(original.get(), 0) != WAIT_TIMEOUT)
-        return WindowHasClosed(window);
-    if (!ProcessHasName(original.get(), L"SystemSettings.exe") ||
-        SettingsProcessForWindow(window.hwnd) != window.settingsPid)
-        return false;
-
-    ProcessHandle target(OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_LIMITED_INFORMATION,
-                                     FALSE, window.settingsPid));
+    // Some Windows builds crash inside the Settings close callback after an HDR
+    // change. Like upstream toggleHDR, end Settings directly instead of sending
+    // WM_CLOSE. Unlike a name-wide taskkill, only this verified process is ended.
+    // Keep the same handle from identity verification through termination so a
+    // recycled numeric PID cannot redirect the termination to another process.
+    ProcessHandle target(OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_LIMITED_INFORMATION |
+                                     SYNCHRONIZE, FALSE, window.settingsPid));
     if (!target || !ProcessHasName(target.get(), L"SystemSettings.exe") ||
-        WaitForSingleObject(original.get(), 0) != WAIT_TIMEOUT ||
+        WaitForSingleObject(target.get(), 0) != WAIT_TIMEOUT ||
         SettingsProcessForWindow(window.hwnd) != window.settingsPid)
-        return false;
+        return WindowHasClosed(window);
+
+    // Never terminate ApplicationFrameHost: it also hosts unrelated apps.
     if (!TerminateProcess(target.get(), 0)) return WindowHasClosed(window);
+    if (WaitForSingleObject(target.get(), 2000) != WAIT_OBJECT_0)
+        return false;
     return WaitForWindowToClose(window, 2000);
 }
 

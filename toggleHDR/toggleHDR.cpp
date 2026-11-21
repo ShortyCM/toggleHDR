@@ -168,13 +168,15 @@ std::string RunAction(const Options& options, Action action) {
     if (options.refreshProfiles) {
         try { settings = hdr::OpenDisplaySettings(); Sleep(1500); }
         catch (...) { failure = std::current_exception(); }
+        // Finish Settings cleanup before changing profile associations. Settings
+        // must not process color-profile notifications while tearing down its UI.
+        if (!hdr::CloseDisplaySettings(settings) && !failure)
+            failure = std::make_exception_ptr(std::runtime_error("The profile was refreshed, but Windows Settings did not close."));
         try {
             display = hdr::SelectDisplay(options.display);
             if (display.mode == hdr::Mode::SDR)
                 hdr::RestoreSdrProfile(display, options.sdrProfile, options.resetProfile);
         } catch (...) { failure = std::current_exception(); }
-        if (!hdr::CloseDisplaySettings(settings) && !failure)
-            failure = std::make_exception_ptr(std::runtime_error("The profile was refreshed, but Windows Settings did not close."));
     }
     if (failure) std::rethrow_exception(failure);
     display = hdr::SelectDisplay(options.display);
