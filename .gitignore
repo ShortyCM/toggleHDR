@@ -9,3 +9,5 @@ Release/
 *.VC.db
 *.opendb
 *.vcxproj.user
+build-native/
+build/
