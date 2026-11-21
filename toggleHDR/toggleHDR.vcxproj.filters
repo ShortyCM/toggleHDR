@@ -29,4 +29,39 @@
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Display.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingsWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClInclude Include="NativeHdr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <None Include="toggleHDR.manifest">
+      <Filter>Resource Files</Filter>
+    </None>
+    <Image Include="HDR.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="SDR.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Unknown.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="HDR-dark.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="SDR-dark.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Unknown-dark.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

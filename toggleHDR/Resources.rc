@@ -1,1 +1,12 @@
+#include <windows.h>
+#include "resource.h"
+
 IDI_ICON1 ICON "toggleHDR_32_48.ico"
+IDI_HDR ICON "HDR.ico"
+IDI_SDR ICON "SDR.ico"
+IDI_UNKNOWN ICON "Unknown.ico"
+IDI_HDR_DARK ICON "HDR-dark.ico"
+IDI_SDR_DARK ICON "SDR-dark.ico"
+IDI_UNKNOWN_DARK ICON "Unknown-dark.ico"
+
+1 RT_MANIFEST "toggleHDR.manifest"
